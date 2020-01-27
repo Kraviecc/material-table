@@ -94,6 +94,7 @@ export interface EditComponentProps<RowData extends object> {
 export interface EditCellColumnDef {
   field: string;
   title: string;
+  type: string;
   tableData: {
     filterValue: any;
     groupOrder: any;
