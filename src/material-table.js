@@ -10,6 +10,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import DataManager from './utils/data-manager';
 import { debounce } from 'debounce';
 import equal from 'fast-deep-equal';
+import { withStyles } from '@material-ui/core';
 /* eslint-enable no-unused-vars */
 
 export default class MaterialTable extends React.Component {
@@ -77,8 +78,8 @@ export default class MaterialTable extends React.Component {
     isInit && this.dataManager.changeOrder(defaultSortColumnIndex, defaultSortDirection);
     isInit && this.dataManager.changeSearchText(props.options.searchText || '');
     isInit && this.dataManager.changeCurrentPage(props.options.initialPage ? props.options.initialPage : 0);
-    this.dataManager.changePageSize(props.options.pageSize);
-    isInit && this.dataManager.changePaging(props.options.paging);
+    (isInit || this.isRemoteData()) && this.dataManager.changePageSize(props.options.pageSize);
+    this.dataManager.changePaging(props.options.paging);
     isInit && this.dataManager.changeParentFunc(props.parentChildData);
     this.dataManager.changeDetailPanelType(props.options.detailPanelType);
   }
@@ -513,7 +514,7 @@ export default class MaterialTable extends React.Component {
                 onChangeRowsPerPage={this.onChangeRowsPerPage}
                 ActionsComponent={(subProps) => props.options.paginationType === 'normal' ?
                   <MTablePagination {...subProps} icons={props.icons} localization={localization} showFirstLastPageButtons={props.options.showFirstLastPageButtons} /> :
-                  <MTableSteppedPagination {...subProps} icons={props.icons} localization={localization} />}
+                  <MTableSteppedPagination {...subProps} icons={props.icons} localization={localization} showFirstLastPageButtons={props.options.showFirstLastPageButtons} />}
                 labelDisplayedRows={(row) => localization.labelDisplayedRows.replace('{from}', row.from).replace('{to}', row.to).replace('{count}', row.count)}
                 labelRowsPerPage={localization.labelRowsPerPage}
               />
@@ -575,7 +576,7 @@ export default class MaterialTable extends React.Component {
             <Droppable droppableId="headers" direction="horizontal">
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
-                  <div style={{ maxHeight: props.options.maxBodyHeight, minHeight: props.options.minBodyHeight, overflowY: 'auto' }}>
+                  <div style={{ maxHeight: props.options.maxBodyHeight, minHeight: props.options.minBodyHeight, overflowY: props.options.overflowY }}>
                     <Table>
                       {props.options.header &&
                         <props.components.Header
@@ -604,6 +605,7 @@ export default class MaterialTable extends React.Component {
                           isTreeData={this.props.parentChildData !== undefined}
                           draggable={props.options.draggable}
                           thirdSortClick={props.options.thirdSortClick}
+                          options={props.options}
                         />
                       }
                       <props.components.Body
@@ -661,7 +663,24 @@ export default class MaterialTable extends React.Component {
   }
 }
 
-const ScrollBar = ({ double, children }) => {
+var style = () => ({
+  horizontalScrollContainer: {
+    '& ::-webkit-scrollbar': {
+      '-webkit-appearance': 'none'
+    },
+    '& ::-webkit-scrollbar:horizontal': {
+      height: 8
+    },
+    '& ::-webkit-scrollbar-thumb': {
+      borderRadius: 4,
+      border: '2px solid white',
+      backgroundColor: 'rgba(0, 0, 0, .3)'
+    }
+  }
+});
+
+
+const ScrollBar = withStyles(style)(({ double, children, classes }) => {
   if (double) {
     return (
       <DoubleScrollbar>
@@ -671,9 +690,9 @@ const ScrollBar = ({ double, children }) => {
   }
   else {
     return (
-      <div style={{ overflowX: 'auto' }}>
+      <div className={classes.horizontalScrollContainer} style={{ overflowX: 'auto' }}>
         {children}
       </div>
     );
   }
-};
+});

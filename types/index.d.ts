@@ -87,6 +87,7 @@ export interface EditComponentProps<RowData extends object> {
   rowData: RowData;
   value: any;
   onChange: (newValue: any) => void;
+  onRowDataChange: (data: any) => void;
   columnDef: EditCellColumnDef;
 }
 
@@ -116,6 +117,7 @@ export interface Column<RowData extends object> {
   export?: boolean;
   field?: keyof RowData | string;
   filtering?: boolean;
+  filterComponent?: ((props: {columnDef: Column<RowData>, onFilterChanged: (rowId: string, value: any) => void}) => React.ReactElement<any>);
   filterPlaceholder?: string;
   filterCellStyle?: React.CSSProperties;
   grouping?: boolean;
@@ -130,7 +132,8 @@ export interface Column<RowData extends object> {
   searchable?: boolean;
   sorting?: boolean;
   title?: string | React.ReactElement<any>;
-  type?: ('string' | 'boolean' | 'numeric' | 'date' | 'datetime' | 'time' | 'currency');
+  tooltip?: string;
+  type?: ('boolean' | 'numeric' | 'date' | 'datetime' | 'time' | 'currency');
 }
 
 export interface Components {
@@ -227,6 +230,7 @@ export interface Options {
   search?: boolean;
   searchFieldAlignment?: 'left' | 'right';
   searchFieldStyle?: React.CSSProperties;
+  searchText?: string;
   selection?: boolean;
   selectionProps?: any | ((data: any) => any);
   sorting?: boolean;
